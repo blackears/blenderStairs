@@ -31,7 +31,7 @@ import bpy
 import bmesh
 from bpy_extras.object_utils import AddObjectHelper
 
-def add_stairs(width, height, depth, numSteps):
+def add_stairs(width, height, depth, numSteps, sides):
 
     width /= 2
 
@@ -61,21 +61,22 @@ def add_stairs(width, height, depth, numSteps):
     verts.append((width, depth, height))
     faces.append((f + 0, f + 1, f - 1, f - 2))
 
-    #Far bottom vertices
-    verts.append((-width, depth, 0))
-    verts.append((width, depth, 0))
-    
-    faces.append((f + 0, f + 1, f + 3, f + 2))
-    faces.append((0, 1, f + 3, f + 2))
-    
-    leftFace = []
-    rightFace = []
-    for i in range(numSteps * 2 + 2):
-        leftFace.append(i * 2)
-        rightFace.append(i * 2 + 1)
+    if sides:
+        #Far bottom vertices
+        verts.append((-width, depth, 0))
+        verts.append((width, depth, 0))
         
-    faces.append(leftFace)
-    faces.append(rightFace)
+        faces.append((f + 0, f + 1, f + 3, f + 2))
+        faces.append((0, 1, f + 3, f + 2))
+        
+        leftFace = []
+        rightFace = []
+        for i in range(numSteps * 2 + 2):
+            leftFace.append(i * 2)
+            rightFace.append(i * 2 + 1)
+            
+        faces.append(leftFace)
+        faces.append(rightFace)
 
 
     return verts, faces
@@ -122,6 +123,11 @@ class AddStairs(bpy.types.Operator):
         min=1, max=100,
         default=6,
     )
+    sides: BoolProperty(
+        name="Create Sides",
+        description="Build sides and bottom of stairs.",
+        default=True,
+    )
     layers: BoolVectorProperty(
         name="Layers",
         description="Object Layers",
@@ -156,7 +162,8 @@ class AddStairs(bpy.types.Operator):
             self.width,
             self.height,
             self.depth,
-            self.numSteps
+            self.numSteps,
+            self.sides
         )
 
         mesh = bpy.data.meshes.new("Stairs")
@@ -198,4 +205,4 @@ if __name__ == "__main__":
     register()
 
     # test call
-    bpy.ops.mesh.primitive_stairs_add()
+    #bpy.ops.mesh.primitive_stairs_add()
