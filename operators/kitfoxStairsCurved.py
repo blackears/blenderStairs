@@ -32,7 +32,7 @@ import bmesh
 import math
 from bpy_extras.object_utils import AddObjectHelper
 
-def add_stairs(height, stepWidth, numSteps, curvature, innerRadius, sides):
+def add_stairs(height, stepWidth, numSteps, curvature, innerRadius, ccw, sides):
 
     verts = []
     faces = []
@@ -44,8 +44,12 @@ def add_stairs(height, stepWidth, numSteps, curvature, innerRadius, sides):
     
     #Draw steps    
     for i in range(numSteps + 1):
-        x = math.cos(i * deltaAngle)
-        y = math.sin(i * deltaAngle)
+        if ccw:
+            x = math.cos(i * deltaAngle)
+            y = math.sin(i * deltaAngle)
+        else:
+            x = -math.cos(i * deltaAngle)
+            y = math.sin(i * deltaAngle)
 
         x0 = x * innerRadius
         y0 = y * innerRadius
@@ -67,8 +71,12 @@ def add_stairs(height, stepWidth, numSteps, curvature, innerRadius, sides):
 
     if sides:
         for i in range(1, numSteps + 1):
-            x = math.cos(i * deltaAngle)
-            y = math.sin(i * deltaAngle)
+            if ccw:
+                x = math.cos(i * deltaAngle)
+                y = math.sin(i * deltaAngle)
+            else:
+                x = -math.cos(i * deltaAngle)
+                y = math.sin(i * deltaAngle)
 
             x0 = x * innerRadius
             y0 = y * innerRadius
@@ -163,6 +171,11 @@ class AddStairsCurved(bpy.types.Operator):
         description="Build sides and bottom of stairs.",
         default=True
     )
+    ccw: BoolProperty(
+        name="Counter Clockwise",
+        description="Stairs should spiral in a counter-clockwise direction.",
+        default=True
+    )
     layers: BoolVectorProperty(
         name="Layers",
         description="Object Layers",
@@ -199,6 +212,7 @@ class AddStairsCurved(bpy.types.Operator):
             self.numSteps,
             self.curvature,
             self.innerRadius,
+            self.ccw,
             self.sides
         )
 

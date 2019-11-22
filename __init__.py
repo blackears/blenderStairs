@@ -14,7 +14,7 @@
 
 
 bl_info = {
-    "name": "Curved Stairs Mesh Generator",
+    "name": "Stairs Mesh Generators",
     "description": "Adds new mesh builders for quickly creating staircases.",
     "author": "Mark McKay",
     "version": (1, 0),
