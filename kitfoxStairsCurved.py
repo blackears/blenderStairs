@@ -14,7 +14,7 @@
 
 
 bl_info = {
-    "name": "Stairs Mesh Generator",
+    "name": "Curved Stairs Mesh Generator",
     "description": "Adds a new mesh primitive for creating a staircase.",
     "author": "Mark McKay",
     "version": (1, 0),
@@ -29,55 +29,83 @@ bl_info = {
 
 import bpy
 import bmesh
+import math
 from bpy_extras.object_utils import AddObjectHelper
 
-def add_stairs(width, height, depth, numSteps, sides):
-
-    width /= 2
+def add_stairs(height, stepWidth, numSteps, curvature, innerRadius, sides):
 
     verts = []
     faces = []
     
-    stepDepth = depth / numSteps
     stepHeight = height / numSteps
+    deltaAngle = math.radians(curvature) / numSteps
 
     f = 0
     
     #Draw steps    
-    for i in range(numSteps):
-        verts.append((-width, i * stepDepth, i * stepHeight))
-        verts.append((width, i * stepDepth, i * stepHeight))
-        verts.append((-width, i * stepDepth, (i + 1) * stepHeight))
-        verts.append((width, i * stepDepth, (i + 1) * stepHeight))
+    for i in range(numSteps + 1):
+        x = math.cos(i * deltaAngle)
+        y = math.sin(i * deltaAngle)
 
-        if i != 0:
-            faces.append((f + 0, f + 1, f - 1, f - 2))
-        faces.append((f + 0, f + 1, f + 3, f + 2))
+        x0 = x * innerRadius
+        y0 = y * innerRadius
+        x1 = x * (innerRadius + stepWidth)
+        y1 = y * (innerRadius + stepWidth)
+
+        verts.append((x0, y0, i * stepHeight))
+        verts.append((x1, y1, i * stepHeight))
+        if i != numSteps:
+            verts.append((x0, y0, (i + 1) * stepHeight))
+            verts.append((x1, y1, (i + 1) * stepHeight))
+
         
+    for i in range(numSteps):
+        faces.append((f + 0, f + 1, f + 3, f + 2))
+        faces.append((f + 2, f + 3, f + 5, f + 4))
+
         f += 4
 
-    #Top of last step
-    verts.append((-width, depth, height))
-    verts.append((width, depth, height))
-    faces.append((f + 0, f + 1, f - 1, f - 2))
-
     if sides:
-        #Far bottom vertices
-        verts.append((-width, depth, 0))
-        verts.append((width, depth, 0))
-        
-        faces.append((f + 0, f + 1, f + 3, f + 2))
-        faces.append((0, 1, f + 3, f + 2))
-        
-        leftFace = []
-        rightFace = []
-        for i in range(numSteps * 2 + 2):
-            leftFace.append(i * 2)
-            rightFace.append(i * 2 + 1)
-            
-        faces.append(leftFace)
-        faces.append(rightFace)
+        for i in range(1, numSteps + 1):
+            x = math.cos(i * deltaAngle)
+            y = math.sin(i * deltaAngle)
 
+            x0 = x * innerRadius
+            y0 = y * innerRadius
+            x1 = x * (innerRadius + stepWidth)
+            y1 = y * (innerRadius + stepWidth)
+
+            verts.append((x0, y0, 0))
+            verts.append((x1, y1, 0))
+
+        #construct sides
+        for i in range(0, numSteps):
+            g = i * 4
+            #triangle at step
+            faces.append((g + 0, g + 4, g + 2))
+            faces.append((g + 1, g + 5, g + 3))
+
+        bottomVertIdxStart = numSteps * 4 + 2
+        faces.append((0, 4, bottomVertIdxStart))
+        faces.append((1, 5, bottomVertIdxStart + 1))
+            
+        for i in range(1, numSteps):
+            g = i * 4
+            h = numSteps * 4 + 2 + (i - 1) * 2
+            
+            faces.append((h + 0, h + 2, g + 4, g + 0))
+            faces.append((h + 1, h + 3, g + 5, g + 1))
+        
+        #bottom
+        faces.append((0, 1, bottomVertIdxStart + 1, bottomVertIdxStart))
+
+        for i in range(1, numSteps):
+            h = numSteps * 4 + 2 + (i - 1) * 2
+            faces.append((h + 0, h + 1, h + 3, h + 2))
+            
+        #back
+        faces.append((bottomVertIdxStart - 2, bottomVertIdxStart - 1, numSteps * 6 + 1, numSteps * 6))
+            
 
     return verts, faces
 
@@ -94,28 +122,22 @@ from bpy.props import (
 
 
 class AddStairs(bpy.types.Operator):
-    """Add a stairs mesh"""
-    bl_idname = "mesh.primitive_stairs_add"
-    bl_label = "Add Stairs"
+    """Add a curved stairs mesh"""
+    bl_idname = "mesh.primitive_curved_stairs_add"
+    bl_label = "Add Curved Stairs"
     bl_options = {'REGISTER', 'UNDO'}
 
-    width: FloatProperty(
-        name="Width",
-        description="Stairs Width",
-        min=0.01, max=100.0,
-        default=2.0,
-    )
     height: FloatProperty(
         name="Height",
         description="Stairs Height",
         min=0.01, max=100.0,
         default=1.0,
     )
-    depth: FloatProperty(
-        name="Depth",
-        description="Stairs Depth",
+    stairWidth: FloatProperty(
+        name="Stair Width",
+        description="Width of a single stair",
         min=0.01, max=100.0,
-        default=2.0,
+        default=1.0,
     )
     numSteps: IntProperty(
         name="NumSteps",
@@ -123,10 +145,23 @@ class AddStairs(bpy.types.Operator):
         min=1, max=100,
         default=6,
     )
+    curvature: FloatProperty(
+        name="Curvature",
+        description="Angle arc of staircase will sweep in degrees.",
+        min=0.01, max=360.0,
+        step=20,
+        default=60.0,
+    )
+    innerRadius: FloatProperty(
+        name="Inner Radius",
+        description="Radius of stair curve.",
+        min=0.01, max=1000.0,
+        default=1.0,
+    )
     sides: BoolProperty(
         name="Create Sides",
         description="Build sides and bottom of stairs.",
-        default=True,
+        default=True
     )
     layers: BoolVectorProperty(
         name="Layers",
@@ -159,14 +194,15 @@ class AddStairs(bpy.types.Operator):
     def execute(self, context):
 
         verts_loc, faces = add_stairs(
-            self.width,
             self.height,
-            self.depth,
+            self.stairWidth,
             self.numSteps,
+            self.curvature,
+            self.innerRadius,
             self.sides
         )
 
-        mesh = bpy.data.meshes.new("Stairs")
+        mesh = bpy.data.meshes.new("Curved Stairs")
 
         bm = bmesh.new()
 
@@ -205,4 +241,4 @@ if __name__ == "__main__":
     register()
 
     # test call
-    #bpy.ops.mesh.primitive_stairs_add()
+    #bpy.ops.mesh.primitive_curved_stairs_add()
