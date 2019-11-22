@@ -13,19 +13,19 @@
 #limitations under the License.
 
 
-bl_info = {
-    "name": "Stairs Mesh Generator",
-    "description": "Adds a new mesh primitive for creating a staircase.",
-    "author": "Mark McKay",
-    "version": (1, 0),
-    "blender": (2, 80, 0),
-    "location": "View3D > Add > Mesh",
+#bl_info = {
+#    "name": "Stairs Mesh Generator",
+#    "description": "Adds a new mesh primitive for creating a staircase.",
+#    "author": "Mark McKay",
+#    "version": (1, 0),
+#    "blender": (2, 80, 0),
+#    "location": "View3D > Add > Mesh",
 #    "warning": "", # used for warning icon and text in addons panel
-    "wiki_url": "https://github.com/blackears/blenderStairs",
-    "tracker_url": "https://github.com/blackears/blenderStairs",
-    "support": "COMMUNITY",
-    "category": "Add Mesh"
-}
+#    "wiki_url": "https://github.com/blackears/blenderStairs",
+#    "tracker_url": "https://github.com/blackears/blenderStairs",
+#    "support": "COMMUNITY",
+#    "category": "Add Mesh"
+#}
 
 import bpy
 import bmesh

@@ -13,19 +13,19 @@
 #limitations under the License.
 
 
-bl_info = {
-    "name": "Curved Stairs Mesh Generator",
-    "description": "Adds a new mesh primitive for creating a staircase.",
-    "author": "Mark McKay",
-    "version": (1, 0),
-    "blender": (2, 80, 0),
-    "location": "View3D > Add > Mesh",
+#bl_info = {
+#    "name": "Curved Stairs Mesh Generator",
+#    "description": "Adds a new mesh primitive for creating a staircase.",
+#    "author": "Mark McKay",
+#    "version": (1, 0),
+#    "blender": (2, 80, 0),
+#    "location": "View3D > Add > Mesh",
 #    "warning": "", # used for warning icon and text in addons panel
-    "wiki_url": "https://github.com/blackears/blenderStairs",
-    "tracker_url": "https://github.com/blackears/blenderStairs",
-    "support": "COMMUNITY",
-    "category": "Add Mesh"
-}
+#    "wiki_url": "https://github.com/blackears/blenderStairs",
+#    "tracker_url": "https://github.com/blackears/blenderStairs",
+#    "support": "COMMUNITY",
+#    "category": "Add Mesh"
+#}
 
 import bpy
 import bmesh
@@ -121,7 +121,7 @@ from bpy.props import (
 )
 
 
-class AddStairs(bpy.types.Operator):
+class AddStairsCurved(bpy.types.Operator):
     """Add a curved stairs mesh"""
     bl_idname = "mesh.primitive_curved_stairs_add"
     bl_label = "Add Curved Stairs"
@@ -228,12 +228,12 @@ def menu_func(self, context):
 
 
 def register():
-    bpy.utils.register_class(AddStairs)
+    bpy.utils.register_class(AddStairsCurved)
     bpy.types.VIEW3D_MT_mesh_add.append(menu_func)
 
 
 def unregister():
-    bpy.utils.unregister_class(AddStairs)
+    bpy.utils.unregister_class(AddStairsCurved)
     bpy.types.VIEW3D_MT_mesh_add.remove(menu_func)
 
 
