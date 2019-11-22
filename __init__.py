@@ -47,6 +47,3 @@ def unregister():
     kitfoxStairs.unregister()
     kitfoxStairsCurved.unregister()
 
-
-if __name__ == "__main__":
-    register()
