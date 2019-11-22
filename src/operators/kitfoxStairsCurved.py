@@ -224,8 +224,7 @@ class AddStairsCurved(bpy.types.Operator):
 
 
 def menu_func(self, context):
-    self.layout.operator(AddStairs.bl_idname, icon='MESH_CUBE')
-
+    self.layout.operator(AddStairsCurved.bl_idname, icon='MESH_CUBE')
 
 def register():
     bpy.utils.register_class(AddStairsCurved)
