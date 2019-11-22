@@ -26,11 +26,17 @@ bl_info = {
     "category": "Add Mesh"
 }
 
+if "bpy" in locals():
+    import importlib
+    if "kitfoxStairs" in locals():
+        importlib.reload(kitfoxStairs)
+    if "kitfoxStairsCurved" in locals():
+        importlib.reload(kitfoxStairs)
+else:
+    from .operators import kitfoxStairs
+    from .operators import kitfoxStairsCurved
 
 import bpy
-from .operators import kitfoxStairs
-from .operators import kitfoxStairsCurved
-
 
 def register():
     kitfoxStairs.register()
