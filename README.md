@@ -8,3 +8,5 @@ A video giving a quick tour of the plugin can be seen here:
 https://youtu.be/YlNnEIQWd2k 
 
 <iframe width="560" height="315" src="https://www.youtube.com/embed/YlNnEIQWd2k" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+
+[![Video thumbnail](https://img.youtube.com/vi/YlNnEIQWd2k/0.jpg)](https://www.youtube.com/watch?v=YlNnEIQWd2k)
