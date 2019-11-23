@@ -32,12 +32,18 @@ import bmesh
 import math
 from bpy_extras.object_utils import AddObjectHelper
 
-def add_stairs(height, stepWidth, numSteps, curvature, innerRadius, ccw, sides):
+def add_stairs(height, stepWidth, stepType, numSteps, userStepHeight, curvature, innerRadius, ccw, sides):
 
     verts = []
     faces = []
     
-    stepHeight = height / numSteps
+    if stepType == "NUM_STAIRS": 
+        stepHeight = height / numSteps
+    else:
+        stepHeight = userStepHeight
+        numSteps = max(math.floor(height / userStepHeight), 1)
+        height = stepHeight * numSteps
+        
     deltaAngle = math.radians(curvature) / numSteps
 
     f = 0
@@ -128,6 +134,12 @@ from bpy.props import (
     FloatVectorProperty,
 )
 
+#step type enum
+step_type = [
+    ("NUM_STAIRS", "Num Stairs", "", 1),
+    ("STAIR_HEIGHT", "Stair Height", "", 2),
+]
+
 
 class AddStairsCurved(bpy.types.Operator):
     """Add a curved stairs mesh"""
@@ -147,11 +159,23 @@ class AddStairsCurved(bpy.types.Operator):
         min=0.01, max=100.0,
         default=1.0,
     )
+    stepType: EnumProperty(
+        name="Step Type",
+        description="Choose between using 'number of steps' or 'step height' for determining height of a step",
+        items=step_type,
+        default="NUM_STAIRS",
+    )
     numSteps: IntProperty(
         name="NumSteps",
         description="Number of Steps",
         min=1, max=100,
         default=6,
+    )
+    stepHeight: FloatProperty(
+        name="Step Height",
+        description="Step Height",
+        min=0.01, max=100.0,
+        default=0.16666,
     )
     curvature: FloatProperty(
         name="Curvature",
@@ -209,7 +233,9 @@ class AddStairsCurved(bpy.types.Operator):
         verts_loc, faces = add_stairs(
             self.height,
             self.stairWidth,
+            self.stepType,
             self.numSteps,
+            self.stepHeight,
             self.curvature,
             self.innerRadius,
             self.ccw,

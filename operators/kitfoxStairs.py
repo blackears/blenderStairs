@@ -17,7 +17,7 @@
 #    "name": "Stairs Mesh Generator",
 #    "description": "Adds a new mesh primitive for creating a staircase.",
 #    "author": "Mark McKay",
-#    "version": (1, 0),
+#    "version": (1, 1),
 #    "blender": (2, 80, 0),
 #    "location": "View3D > Add > Mesh",
 #    "warning": "", # used for warning icon and text in addons panel
@@ -29,17 +29,24 @@
 
 import bpy
 import bmesh
+import math
 from bpy_extras.object_utils import AddObjectHelper
 
-def add_stairs(width, height, depth, numSteps, sides):
+def add_stairs(width, height, depth, stepType, numSteps, userStepHeight, sides):
 
     width /= 2
 
     verts = []
     faces = []
     
+    if stepType == "NUM_STAIRS": 
+        stepHeight = height / numSteps
+    else:
+        stepHeight = userStepHeight
+        numSteps = max(math.floor(height / userStepHeight), 1)
+        height = stepHeight * numSteps
+
     stepDepth = depth / numSteps
-    stepHeight = height / numSteps
 
     f = 0
     
@@ -90,11 +97,19 @@ from bpy.props import (
     IntVectorProperty,
     FloatProperty,
     FloatVectorProperty,
+    EnumProperty,
 )
 
+#step type enum
+step_type = [
+    ("NUM_STAIRS", "Num Stairs", "", 1),
+    ("STAIR_HEIGHT", "Stair Height", "", 2),
+]
 
 class AddStairs(bpy.types.Operator):
     """Add a stairs mesh"""
+
+    
     bl_idname = "mesh.primitive_stairs_add"
     bl_label = "Add Stairs"
     bl_options = {'REGISTER', 'UNDO'}
@@ -117,11 +132,23 @@ class AddStairs(bpy.types.Operator):
         min=0.01, max=100.0,
         default=2.0,
     )
+    stepType: EnumProperty(
+        name="Step Type",
+        description="Choose between using 'number of steps' or 'step height' for determining height of a step",
+        items=step_type,
+        default="NUM_STAIRS",
+    )
     numSteps: IntProperty(
-        name="NumSteps",
+        name="Number of Steps",
         description="Number of Steps",
         min=1, max=100,
         default=6,
+    )
+    stepHeight: FloatProperty(
+        name="Step Height",
+        description="Step Height",
+        min=0.01, max=100.0,
+        default=0.16666,
     )
     sides: BoolProperty(
         name="Create Sides",
@@ -156,13 +183,16 @@ class AddStairs(bpy.types.Operator):
         subtype='EULER',
     )
 
+
     def execute(self, context):
 
         verts_loc, faces = add_stairs(
             self.width,
             self.height,
             self.depth,
+            self.stepType,
             self.numSteps,
+            self.stepHeight,
             self.sides
         )
 
