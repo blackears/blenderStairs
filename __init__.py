@@ -17,7 +17,7 @@ bl_info = {
     "name": "Stairs Mesh Generators",
     "description": "Adds new mesh builders for quickly creating staircases.",
     "author": "Mark McKay",
-    "version": (1, 0),
+    "version": (1, 1),
     "blender": (2, 80, 0),
     "location": "View3D > Add > Mesh",
     "wiki_url": "https://github.com/blackears/blenderStairs",

@@ -48,6 +48,11 @@ def add_stairs(height, stepWidth, stepType, numSteps, userStepHeight, curvature,
 
     f = 0
     
+    if ccw:
+        offsetX = -innerRadius - stepWidth / 2
+    else:
+        offsetX = innerRadius + stepWidth / 2
+    
     #Draw steps    
     for i in range(numSteps + 1):
         if ccw:
@@ -57,9 +62,9 @@ def add_stairs(height, stepWidth, stepType, numSteps, userStepHeight, curvature,
             x = -math.cos(i * deltaAngle)
             y = math.sin(i * deltaAngle)
 
-        x0 = x * innerRadius
+        x0 = x * innerRadius + offsetX
         y0 = y * innerRadius
-        x1 = x * (innerRadius + stepWidth)
+        x1 = x * (innerRadius + stepWidth) + offsetX
         y1 = y * (innerRadius + stepWidth)
 
         verts.append((x0, y0, i * stepHeight))
@@ -84,9 +89,9 @@ def add_stairs(height, stepWidth, stepType, numSteps, userStepHeight, curvature,
                 x = -math.cos(i * deltaAngle)
                 y = math.sin(i * deltaAngle)
 
-            x0 = x * innerRadius
+            x0 = x * innerRadius + offsetX
             y0 = y * innerRadius
-            x1 = x * (innerRadius + stepWidth)
+            x1 = x * (innerRadius + stepWidth) + offsetX
             y1 = y * (innerRadius + stepWidth)
 
             verts.append((x0, y0, 0))
