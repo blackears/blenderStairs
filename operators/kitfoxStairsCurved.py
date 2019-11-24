@@ -36,6 +36,7 @@ def add_stairs(height, stepWidth, stepType, numSteps, userStepHeight, curvature,
 
     verts = []
     faces = []
+    uvs = []
     
     if stepType == "NUM_STAIRS": 
         stepHeight = height / numSteps
@@ -45,6 +46,7 @@ def add_stairs(height, stepWidth, stepType, numSteps, userStepHeight, curvature,
         height = stepHeight * numSteps
         
     deltaAngle = math.radians(curvature) / numSteps
+    stepDepth = 2 * math.pi * (curvature / 360) * (innerRadius + stepWidth / 2) / numSteps
 
     f = 0
     
@@ -73,10 +75,16 @@ def add_stairs(height, stepWidth, stepType, numSteps, userStepHeight, curvature,
             verts.append((x0, y0, (i + 1) * stepHeight))
             verts.append((x1, y1, (i + 1) * stepHeight))
 
+    uvyOffset = 0
         
     for i in range(numSteps):
         faces.append((f + 0, f + 1, f + 3, f + 2))
+        uvs.append(((0, uvyOffset), (stepWidth, uvyOffset), (stepWidth, uvyOffset + stepHeight), (0, uvyOffset + stepHeight)))
+        uvyOffset+= stepHeight
+
         faces.append((f + 2, f + 3, f + 5, f + 4))
+        uvs.append(((0, uvyOffset), (stepWidth, uvyOffset), (stepWidth, uvyOffset + stepDepth), (0, uvyOffset + stepDepth)))
+        uvyOffset+= stepDepth
 
         f += 4
 
@@ -102,18 +110,27 @@ def add_stairs(height, stepWidth, stepType, numSteps, userStepHeight, curvature,
             g = i * 4
             #triangle at step
             faces.append((g + 0, g + 4, g + 2))
+            uvs.append(((0, 0), (0, 0), (0, 0), (0, 0)))
+        
             faces.append((g + 1, g + 5, g + 3))
+            uvs.append(((0, 0), (0, 0), (0, 0), (0, 0)))
 
         bottomVertIdxStart = numSteps * 4 + 2
         faces.append((0, 4, bottomVertIdxStart))
+        uvs.append(((0, 0), (0, 0), (0, 0), (0, 0)))
+        
         faces.append((1, 5, bottomVertIdxStart + 1))
+        uvs.append(((0, 0), (0, 0), (0, 0), (0, 0)))
             
         for i in range(1, numSteps):
             g = i * 4
             h = numSteps * 4 + 2 + (i - 1) * 2
             
             faces.append((h + 0, h + 2, g + 4, g + 0))
+            uvs.append(((0, 0), (0, 0), (0, 0), (0, 0)))
+
             faces.append((h + 1, h + 3, g + 5, g + 1))
+            uvs.append(((0, 0), (0, 0), (0, 0), (0, 0)))
         
         #bottom
         faces.append((0, 1, bottomVertIdxStart + 1, bottomVertIdxStart))
@@ -121,12 +138,14 @@ def add_stairs(height, stepWidth, stepType, numSteps, userStepHeight, curvature,
         for i in range(1, numSteps):
             h = numSteps * 4 + 2 + (i - 1) * 2
             faces.append((h + 0, h + 1, h + 3, h + 2))
+            uvs.append(((0, 0), (0, 0), (0, 0), (0, 0)))
             
         #back
         faces.append((bottomVertIdxStart - 2, bottomVertIdxStart - 1, numSteps * 6 + 1, numSteps * 6))
+        uvs.append(((0, 0), (0, 0), (0, 0), (0, 0)))
             
 
-    return verts, faces
+    return verts, faces, uvs
 
 
 from bpy.props import (
@@ -235,7 +254,7 @@ class AddStairsCurved(bpy.types.Operator):
 
     def execute(self, context):
 
-        verts_loc, faces = add_stairs(
+        verts_loc, faces, uvs = add_stairs(
             self.height,
             self.stairWidth,
             self.stepType,
@@ -257,6 +276,14 @@ class AddStairsCurved(bpy.types.Operator):
         bm.verts.ensure_lookup_table()
         for f_idx in faces:
             bm.faces.new([bm.verts[i] for i in f_idx])
+
+        #create a uv layer and generate uv coords
+        uv_layer = bm.loops.layers.uv.new()
+
+        loop = bm.loops.layers.uv[0]
+        for face, faceUvs in zip(bm.faces, uvs):
+            for loop, uv in zip(face.loops, faceUvs):
+                loop[uv_layer].uv = uv
 
         bm.to_mesh(mesh)
         mesh.update()
