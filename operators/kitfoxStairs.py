@@ -38,6 +38,7 @@ def add_stairs(width, height, depth, stepType, numSteps, userStepHeight, sides):
 
     verts = []
     faces = []
+    uvs = []
     
     if stepType == "NUM_STAIRS": 
         stepHeight = height / numSteps
@@ -49,6 +50,7 @@ def add_stairs(width, height, depth, stepType, numSteps, userStepHeight, sides):
     stepDepth = depth / numSteps
 
     f = 0
+    uvyOffset = 0
     
     #Draw steps    
     for i in range(numSteps):
@@ -59,7 +61,13 @@ def add_stairs(width, height, depth, stepType, numSteps, userStepHeight, sides):
 
         if i != 0:
             faces.append((f + 0, f + 1, f - 1, f - 2))
+            uvs.append(((-width, uvyOffset + stepDepth), (width, uvyOffset + stepDepth), (width, uvyOffset), (-width, uvyOffset)))
+            uvyOffset+= stepDepth
+            
         faces.append((f + 0, f + 1, f + 3, f + 2))
+        uvs.append(((-width, uvyOffset), (width, uvyOffset), (width, uvyOffset + stepHeight), (-width, uvyOffset + stepHeight)))
+
+        uvyOffset+= stepHeight
         
         f += 4
 
@@ -67,6 +75,7 @@ def add_stairs(width, height, depth, stepType, numSteps, userStepHeight, sides):
     verts.append((-width, depth, height))
     verts.append((width, depth, height))
     faces.append((f + 0, f + 1, f - 1, f - 2))
+    uvs.append(((-width, uvyOffset + stepDepth), (width, uvyOffset + stepDepth), (width, uvyOffset), (-width, uvyOffset)))
 
     if sides:
         #Far bottom vertices
@@ -74,19 +83,31 @@ def add_stairs(width, height, depth, stepType, numSteps, userStepHeight, sides):
         verts.append((width, depth, 0))
         
         faces.append((f + 0, f + 1, f + 3, f + 2))
+        uvs.append(((-width, height), (width, height), (width, 0), (-width, 0)))
+        
         faces.append((0, 1, f + 3, f + 2))
+        uvs.append(((-width, depth), (width, depth), (width, 0), (-width, 0)))
         
         leftFace = []
         rightFace = []
+        leftFaceUvs = []
+        rightFaceUvs = []
         for i in range(numSteps * 2 + 2):
-            leftFace.append(i * 2)
-            rightFace.append(i * 2 + 1)
+            idx = i * 2
+            leftFace.append(idx)
+            leftFaceUvs.append((verts[idx][1], verts[idx][2]))
+            
+            idx = i * 2 + 1
+            rightFace.append(idx)
+            rightFaceUvs.append((verts[idx][1], verts[idx][2]))
             
         faces.append(leftFace)
         faces.append(rightFace)
+        uvs.append(leftFaceUvs)
+        uvs.append(rightFaceUvs)
 
 
-    return verts, faces
+    return verts, faces, uvs
 
 
 from bpy.props import (
@@ -186,7 +207,7 @@ class AddStairs(bpy.types.Operator):
 
     def execute(self, context):
 
-        verts_loc, faces = add_stairs(
+        verts_loc, faces, uvs = add_stairs(
             self.width,
             self.height,
             self.depth,
@@ -206,6 +227,15 @@ class AddStairs(bpy.types.Operator):
         bm.verts.ensure_lookup_table()
         for f_idx in faces:
             bm.faces.new([bm.verts[i] for i in f_idx])
+
+        #create a uv layer and generate uv coords
+        uv_layer = bm.loops.layers.uv.new()
+
+        loop = bm.loops.layers.uv[0]
+        for face, faceUvs in zip(bm.faces, uvs):
+            for loop, uv in zip(face.loops, faceUvs):
+                loop[uv_layer].uv = uv
+
 
         bm.to_mesh(mesh)
         mesh.update()
