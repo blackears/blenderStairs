@@ -30,6 +30,8 @@
 import bpy
 import bmesh
 import math
+import os
+import bpy.utils.previews
 from bpy_extras.object_utils import AddObjectHelper
 
 def add_stairs(height, stepWidth, stepType, numSteps, userStepHeight, curvature, innerRadius, ccw, sides):
@@ -110,21 +112,17 @@ def add_stairs(height, stepWidth, stepType, numSteps, userStepHeight, curvature,
             g = i * 4
             #triangle at step
             faces.append((g + 0, g + 4, g + 2))
-#            uvs.append(((0, 0), (0, 0), (0, 0), (0, 0)))
             uvs.append(((i * stepDepth, verts[g + 0][2]), ((i + 1) * stepDepth, verts[g + 4][2]), (i * stepDepth, verts[g + 2][2])))
        
             faces.append((g + 1, g + 5, g + 3))
-#            uvs.append(((0, 0), (0, 0), (0, 0), (0, 0)))
             uvs.append(((i * stepDepth, verts[g + 0][2]), ((i + 1) * stepDepth, verts[g + 4][2]), (i * stepDepth, verts[g + 2][2])))
 
         #side of first step of stairs
         bottomVertIdxStart = numSteps * 4 + 2
         faces.append((0, 4, bottomVertIdxStart))
-#        uvs.append(((0, 0), (0, 0), (0, 0)))
         uvs.append(((0, verts[0][2]), (stepDepth, verts[4][2]), (stepDepth, verts[bottomVertIdxStart][2])))
         
         faces.append((1, 5, bottomVertIdxStart + 1))
-#        uvs.append(((0, 0), (0, 0), (0, 0)))
         uvs.append(((0, verts[0][2]), (stepDepth, verts[4][2]), (stepDepth, verts[bottomVertIdxStart][2])))
             
         #Side slats
@@ -133,12 +131,10 @@ def add_stairs(height, stepWidth, stepType, numSteps, userStepHeight, curvature,
             h = numSteps * 4 + 2 + (i - 1) * 2
             
             faces.append((h + 0, h + 2, g + 4, g + 0))
-#            uvs.append(((0, 0), (0, 0), (0, 0), (0, 0)))
             uvs.append(((i * stepDepth, verts[h + 0][2]), ((i + 1) * stepDepth, verts[h + 2][2]), ((i + 1) * stepDepth, verts[g + 4][2]), (i * stepDepth, verts[g + 0][2])))
 
             faces.append((h + 1, h + 3, g + 5, g + 1))
             uvs.append(((i * stepDepth, verts[h + 0][2]), ((i + 1) * stepDepth, verts[h + 2][2]), ((i + 1) * stepDepth, verts[g + 4][2]), (i * stepDepth, verts[g + 0][2])))
-#            uvs.append(((0, 0), (0, 0), (0, 0), (0, 0)))
         
         #bottom
         faces.append((0, 1, bottomVertIdxStart + 1, bottomVertIdxStart))
@@ -147,8 +143,6 @@ def add_stairs(height, stepWidth, stepType, numSteps, userStepHeight, curvature,
         for i in range(1, numSteps):
             h = numSteps * 4 + 2 + (i - 1) * 2
             faces.append((h + 0, h + 1, h + 3, h + 2))
-#            uvs.append(((0, 0), (0, 0), (0, 0), (0, 0)))
-#            uvs.append(((0, verts[h + 0][2]), (stepWidth, verts[h + 1][2]), (stepWidth, verts[h + 3][2]), (0, verts[h + 2][2])))
             uvs.append(((0, i * stepDepth), (stepWidth, i * stepDepth), (stepWidth, (i + 1) * stepDepth), (0, (i + 1) * stepDepth)))
 
         #back
@@ -307,11 +301,12 @@ class AddStairsCurved(bpy.types.Operator):
 
 
 def menu_func(self, context):
-    self.layout.operator(AddStairsCurved.bl_idname, icon='MESH_CUBE')
+    self.layout.operator(AddStairsCurved.bl_idname, icon='FORWARD')
 
 def register():
     bpy.utils.register_class(AddStairsCurved)
     bpy.types.VIEW3D_MT_mesh_add.append(menu_func)
+    
 
 
 def unregister():

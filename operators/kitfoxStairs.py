@@ -248,7 +248,7 @@ class AddStairs(bpy.types.Operator):
 
 
 def menu_func(self, context):
-    self.layout.operator(AddStairs.bl_idname, icon='MESH_CUBE')
+    self.layout.operator(AddStairs.bl_idname, icon='FORWARD')
 
 
 def register():
