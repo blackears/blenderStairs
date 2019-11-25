@@ -7,3 +7,4 @@ To install, download this archive as a .zip file.  Then start blender and open y
 A video giving a quick tour of the plugin is available here:
 
 [![Video thumbnail](https://img.youtube.com/vi/YlNnEIQWd2k/0.jpg)](https://www.youtube.com/watch?v=YlNnEIQWd2k)
+[![Video thumbnail](https://img.youtube.com/vi/YlNnEIQWd2k/0.jpg)](https://www.youtube.com/watch?v=YbwRDwlplXo)
