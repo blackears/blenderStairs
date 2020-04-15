@@ -64,8 +64,8 @@ def add_stairs(width, height, depth, stepType, numSteps, userStepHeight, sides):
             uvs.append(((-width, uvyOffset + stepDepth), (width, uvyOffset + stepDepth), (width, uvyOffset), (-width, uvyOffset)))
             uvyOffset+= stepDepth
             
-        faces.append((f + 0, f + 1, f + 3, f + 2))
-        uvs.append(((-width, uvyOffset), (width, uvyOffset), (width, uvyOffset + stepHeight), (-width, uvyOffset + stepHeight)))
+        faces.append((f + 0, f + 2, f + 3, f + 1))
+        uvs.append(((-width, uvyOffset), (-width, uvyOffset + stepHeight), (width, uvyOffset + stepHeight), (width, uvyOffset)))
 
         uvyOffset+= stepHeight
         
@@ -82,8 +82,8 @@ def add_stairs(width, height, depth, stepType, numSteps, userStepHeight, sides):
         verts.append((-width, depth, 0))
         verts.append((width, depth, 0))
         
-        faces.append((f + 0, f + 1, f + 3, f + 2))
-        uvs.append(((-width, height), (width, height), (width, 0), (-width, 0)))
+        faces.append((f + 0, f + 2, f + 3, f + 1))#
+        uvs.append(((-width, height), (-width, 0), (width, 0), (width, height)))
         
         faces.append((0, 1, f + 3, f + 2))
         uvs.append(((-width, depth), (width, depth), (width, 0), (-width, 0)))
@@ -94,8 +94,8 @@ def add_stairs(width, height, depth, stepType, numSteps, userStepHeight, sides):
         rightFaceUvs = []
         for i in range(numSteps * 2 + 2):
             idx = i * 2
-            leftFace.append(idx)
-            leftFaceUvs.append((verts[idx][1], verts[idx][2]))
+            leftFace.insert(0, idx)
+            leftFaceUvs.insert(0, (verts[idx][1], verts[idx][2]))
             
             idx = i * 2 + 1
             rightFace.append(idx)
