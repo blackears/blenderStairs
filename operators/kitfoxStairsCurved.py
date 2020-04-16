@@ -80,12 +80,12 @@ def add_stairs(height, stepWidth, stepType, numSteps, userStepHeight, curvature,
     uvyOffset = 0
         
     for i in range(numSteps):
-        faces.append((f + 0, f + 2, f + 3, f + 1))
-        uvs.append(((0, uvyOffset), (0, uvyOffset + stepHeight), (stepWidth, uvyOffset + stepHeight), (stepWidth, uvyOffset)))
+        faces.append((f + 0, f + 1, f + 3, f + 2))
+        uvs.append(((0, uvyOffset), (stepWidth, uvyOffset), (stepWidth, uvyOffset + stepHeight), (0, uvyOffset + stepHeight)))
         uvyOffset+= stepHeight
 
-        faces.append((f + 2, f + 4, f + 5, f + 3))
-        uvs.append(((0, uvyOffset), (0, uvyOffset + stepDepth), (stepWidth, uvyOffset + stepDepth), (stepWidth, uvyOffset)))
+        faces.append((f + 2, f + 3, f + 5, f + 4))
+        uvs.append(((0, uvyOffset), (stepWidth, uvyOffset), (stepWidth, uvyOffset + stepDepth), (0, uvyOffset + stepDepth)))
         uvyOffset+= stepDepth
 
         f += 4
@@ -111,43 +111,43 @@ def add_stairs(height, stepWidth, stepType, numSteps, userStepHeight, curvature,
         for i in range(0, numSteps):
             g = i * 4
             #triangle at step
-            faces.append((g + 0, g + 4, g + 2))
-            uvs.append(((i * stepDepth, verts[g + 0][2]), ((i + 1) * stepDepth, verts[g + 4][2]), (i * stepDepth, verts[g + 2][2])))
-       
-            faces.append((g + 1, g + 3, g + 5))
+            faces.append((g + 0, g + 2, g + 4))
             uvs.append(((i * stepDepth, verts[g + 0][2]), (i * stepDepth, verts[g + 2][2]), ((i + 1) * stepDepth, verts[g + 4][2])))
+       
+            faces.append((g + 1, g + 5, g + 3))
+            uvs.append(((i * stepDepth, verts[g + 0][2]), ((i + 1) * stepDepth, verts[g + 4][2]), (i * stepDepth, verts[g + 2][2])))
 
         #side of first step of stairs
         bottomVertIdxStart = numSteps * 4 + 2
-        faces.append((0, bottomVertIdxStart, 4))
-        uvs.append(((0, verts[0][2]), (stepDepth, verts[bottomVertIdxStart][2]), (stepDepth, verts[4][2])))
-        
-        faces.append((1, 5, bottomVertIdxStart + 1))
+        faces.append((0, 4, bottomVertIdxStart))
         uvs.append(((0, verts[0][2]), (stepDepth, verts[4][2]), (stepDepth, verts[bottomVertIdxStart][2])))
+        
+        faces.append((1, bottomVertIdxStart + 1, 5))
+        uvs.append(((0, verts[0][2]), (stepDepth, verts[bottomVertIdxStart][2]), (stepDepth, verts[4][2])))
             
         #Side slats
         for i in range(1, numSteps):
             g = i * 4
             h = numSteps * 4 + 2 + (i - 1) * 2
             
-            faces.append((h + 0, h + 2, g + 4, g + 0))
-            uvs.append(((i * stepDepth, verts[h + 0][2]), ((i + 1) * stepDepth, verts[h + 2][2]), ((i + 1) * stepDepth, verts[g + 4][2]), (i * stepDepth, verts[g + 0][2])))
-
-            faces.append((h + 1, g + 1, g + 5, h + 3))
+            faces.append((h + 0, g + 0, g + 4, h + 2))
             uvs.append(((i * stepDepth, verts[h + 0][2]), (i * stepDepth, verts[g + 0][2]), ((i + 1) * stepDepth, verts[g + 4][2]), ((i + 1) * stepDepth, verts[h + 2][2])))
+
+            faces.append((h + 1, h + 3, g + 5, g + 1))
+            uvs.append(((i * stepDepth, verts[h + 0][2]), ((i + 1) * stepDepth, verts[h + 2][2]), ((i + 1) * stepDepth, verts[g + 4][2]), (i * stepDepth, verts[g + 0][2])))
         
         #bottom
-        faces.append((0, 1, bottomVertIdxStart + 1, bottomVertIdxStart))
-        uvs.append(((0, 0), (stepWidth, 0), (stepWidth, stepDepth), (0, stepDepth)))
+        faces.append((0, bottomVertIdxStart, bottomVertIdxStart + 1, 1))
+        uvs.append(((0, 0), (0, stepDepth), (stepWidth, stepDepth), (stepWidth, 0)))
 
         for i in range(1, numSteps):
             h = numSteps * 4 + 2 + (i - 1) * 2
-            faces.append((h + 0, h + 1, h + 3, h + 2))
-            uvs.append(((0, i * stepDepth), (stepWidth, i * stepDepth), (stepWidth, (i + 1) * stepDepth), (0, (i + 1) * stepDepth)))
+            faces.append((h + 0, h + 2, h + 3, h + 1))
+            uvs.append(((0, i * stepDepth), (0, (i + 1) * stepDepth), (stepWidth, (i + 1) * stepDepth), (stepWidth, i * stepDepth)))
 
         #back
-        faces.append((bottomVertIdxStart - 2, numSteps * 6, numSteps * 6 + 1, bottomVertIdxStart - 1))
-        uvs.append(((0, 1), (0, 0), (1, 0), (1, 1)))
+        faces.append((bottomVertIdxStart - 2, bottomVertIdxStart - 1, numSteps * 6 + 1, numSteps * 6))
+        uvs.append(((0, 1), (1, 1), (1, 0), (0, 0)))
             
 
     return verts, faces, uvs
