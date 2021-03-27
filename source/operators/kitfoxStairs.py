@@ -124,19 +124,19 @@ class AddStairs(bpy.types.Operator):
     width: FloatProperty(
         name="Width",
         description="Stairs Width",
-        min=0.01, max=100.0,
+        min=0.01, soft_max=100.0,
         default=2.0,
     )
     height: FloatProperty(
         name="Height",
         description="Stairs Height",
-        min=0.01, max=100.0,
+        min=0.01, soft_max=100.0,
         default=1.0,
     )
     depth: FloatProperty(
         name="Depth",
         description="Stairs Depth",
-        min=0.01, max=100.0,
+        min=0.01, soft_max=100.0,
         default=2.0,
     )
     stepType: EnumProperty(
@@ -148,13 +148,13 @@ class AddStairs(bpy.types.Operator):
     numSteps: IntProperty(
         name="Number of Steps",
         description="Number of Steps",
-        min=1, max=100,
+        min=1, soft_max=100,
         default=6,
     )
     stepHeight: FloatProperty(
         name="Step Height",
         description="Step Height",
-        min=0.01, max=100.0,
+        min=0.01, soft_max=100.0,
         default=0.16666,
     )
     sides: BoolProperty(
@@ -224,6 +224,7 @@ class AddStairs(bpy.types.Operator):
 
 
         bm.to_mesh(mesh)
+        bm.free()
         mesh.update()
 
         # add the mesh as an object into the scene with this utility module

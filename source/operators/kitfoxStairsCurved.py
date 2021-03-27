@@ -165,13 +165,13 @@ class AddStairsCurved(bpy.types.Operator):
     height: FloatProperty(
         name="Height",
         description="Stairs Height",
-        min=0.01, max=100.0,
+        min=0.01, soft_max=100.0,
         default=1.0,
     )
     stairWidth: FloatProperty(
         name="Stair Width",
         description="Width of a single stair",
-        min=0.01, max=100.0,
+        min=0.01, soft_max=100.0,
         default=1.0,
     )
     stepType: EnumProperty(
@@ -183,26 +183,26 @@ class AddStairsCurved(bpy.types.Operator):
     numSteps: IntProperty(
         name="NumSteps",
         description="Number of Steps",
-        min=1, max=100,
+        min=1, soft_max=100,
         default=6,
     )
     stepHeight: FloatProperty(
         name="Step Height",
         description="Step Height",
-        min=0.01, max=100.0,
+        min=0.01, soft_max=100.0,
         default=0.16666,
     )
     curvature: FloatProperty(
         name="Curvature",
         description="Angle arc of staircase will sweep in degrees.",
-        min=0.01, max=360.0,
+        min=0.01, soft_max=360.0,
         step=20,
         default=60.0,
     )
     innerRadius: FloatProperty(
         name="Inner Radius",
         description="Radius of stair curve.",
-        min=0.01, max=1000.0,
+        min=0.01, soft_max=100.0,
         default=1.0,
     )
     sides: BoolProperty(
@@ -277,6 +277,7 @@ class AddStairsCurved(bpy.types.Operator):
                 loop[uv_layer].uv = uv
 
         bm.to_mesh(mesh)
+        bm.free()
         mesh.update()
 
         # add the mesh as an object into the scene with this utility module
